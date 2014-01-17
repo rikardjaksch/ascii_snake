@@ -17,7 +17,6 @@ int main() {
 	unsigned int currentTime = timeGetTime(), previousTime = currentTime, elapsedTime = 0, milliSecondsPerMovement = 100, movementTimer = 0, snakeLength = 1;
 	float delta = 0.0f;
 	for (unsigned int i = 0; i < snakeLength; ++i) { snake[i] = Vec2(70 / 2, 35 / 2); }
-	::SetConsoleTitleA("ASCII_Snake");
 	::SetConsoleWindowInfo(output, TRUE, &windowSize);
 	::SetConsoleScreenBufferSize(output, bufferSize);
 	while (!isGameDone) {
