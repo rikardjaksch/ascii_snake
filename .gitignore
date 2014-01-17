@@ -1,2 +1,5 @@
 *.sln
-*.vcxproj
+*.vcxproj*
+Debug/
+ipch/
+*.*sdf
