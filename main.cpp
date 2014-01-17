@@ -1,62 +1,32 @@
 #include <Windows.h>
 #include <time.h>
 #pragma comment(lib, "winmm.lib")
-struct Vec2 { int x; int y; Vec2():x(0), y(0) {} Vec2(int x, int y):x(x), y(y) {} };
-int main() {
-	timeBeginPeriod(0);
-	srand((unsigned int)time(nullptr));
-	HANDLE output = (HANDLE)::GetStdHandle(STD_OUTPUT_HANDLE), input = (HANDLE)::GetStdHandle(STD_INPUT_HANDLE);
-	SMALL_RECT windowSize = {0, 0, 70 - 1, 35 - 1};
-	COORD bufferSize = {70, 35}, bufferCoord = {0, 0};
-	SMALL_RECT region = {0, 0, 70 - 1, 35 - 1};
-	CHAR_INFO outputBuffer[70 * 35];	
-	bool isGameDone = false;
-	Vec2 applePosition = Vec2(10, 10), snake[100], snakeDirection(-1, 0);
-	DWORD numberOfEvents, numberOfEventsRead;
-	INPUT_RECORD* eventBuffer = nullptr;
-	unsigned int currentTime = timeGetTime(), previousTime = currentTime, elapsedTime = 0, milliSecondsPerMovement = 100, movementTimer = 0, snakeLength = 1;
-	float delta = 0.0f;
-	for (unsigned int i = 0; i < snakeLength; ++i) { snake[i] = Vec2(70 / 2, 35 / 2); }
-	::SetConsoleWindowInfo(output, TRUE, &windowSize);
-	::SetConsoleScreenBufferSize(output, bufferSize);
-	while (!isGameDone) {
-		previousTime = currentTime;
-		currentTime = timeGetTime();
-		elapsedTime = currentTime - previousTime;
-		for (int i = 0; i < 70 * 35; ++i) { outputBuffer[i].Char.AsciiChar = ' '; outputBuffer[i].Attributes = 0; }
-		::GetNumberOfConsoleInputEvents(input, &numberOfEvents);
-		if (numberOfEvents) { eventBuffer = (INPUT_RECORD*)malloc(sizeof(INPUT_RECORD) * numberOfEvents); ReadConsoleInput(input, eventBuffer, numberOfEvents, &numberOfEventsRead); }
-		for (unsigned int i = 0; i < numberOfEventsRead; ++i) {
-			if (eventBuffer[i].EventType == KEY_EVENT) {
-				if (eventBuffer[i].Event.KeyEvent.wVirtualKeyCode == VK_LEFT) { if (!(snakeDirection.x == 1 && snakeDirection.y == 0)) { snakeDirection.x = -1; snakeDirection.y = 0; } } 
-				if (eventBuffer[i].Event.KeyEvent.wVirtualKeyCode == VK_RIGHT) { if (!(snakeDirection.x == -1 && snakeDirection.y == 0)) { snakeDirection.x = 1; snakeDirection.y = 0; }  }
-				if (eventBuffer[i].Event.KeyEvent.wVirtualKeyCode == VK_UP) { if (!(snakeDirection.x == 0 && snakeDirection.y == 1)) { snakeDirection.x = 0; snakeDirection.y = -1; }  }
-				if (eventBuffer[i].Event.KeyEvent.wVirtualKeyCode == VK_DOWN) { if (!(snakeDirection.x == 0 && snakeDirection.y == -1)) { snakeDirection.x = 0; snakeDirection.y = 1; } }
-			}
-		}
-		if (numberOfEvents > 0) { free(eventBuffer); }
-		if ((movementTimer += elapsedTime) > milliSecondsPerMovement) { for (int i = snakeLength - 1; i > 0; --i) { snake[i].x = snake[i - 1].x; snake[i].y = snake[i - 1].y; } snake[0].x += snakeDirection.x; snake[0].y += snakeDirection.y; movementTimer = 0; }
-		for (unsigned int i = 1; i < snakeLength - 1; ++i) { if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) { isGameDone = true; } }
-		if (snake[0].x < 0 || snake[0].x > 70 - 1 || snake[0].y < 0 || snake[0].y > 35 - 1) { break; }
-		if (snake[0].x == applePosition.x && snake[0].y == applePosition.y) {		
-			while (true) {
-				bool foundGoodSpot = true;
-				applePosition.x = rand() % 70;
-				applePosition.y = rand() % 35;
-				for (unsigned int i = 0; i < snakeLength; ++i) { if (snake[i].x == applePosition.x && snake[i].y == applePosition.y) { foundGoodSpot = false; } }
-				if (foundGoodSpot) { break; }
-			}
-			snake[snakeLength++] = Vec2(snake[snakeLength - 1].x, snake[snakeLength - 1].y);
-			milliSecondsPerMovement -= (milliSecondsPerMovement < 50) ? 0 : 10;
-		}
-		outputBuffer[applePosition.y * 70 + applePosition.x].Char.AsciiChar = '@';
-		outputBuffer[applePosition.y * 70 + applePosition.x].Attributes = FOREGROUND_RED;	
-		for (unsigned int i = 0; i < snakeLength; ++i) {
-			outputBuffer[snake[i].y * 70 + snake[i].x].Char.AsciiChar = '#';
-			outputBuffer[snake[i].y * 70 + snake[i].x].Attributes = FOREGROUND_GREEN;
-		}		
-		::WriteConsoleOutputA(output, outputBuffer, bufferSize, bufferCoord, &region);
-	}
-	timeEndPeriod(0);
-	return 0;
-}
+#define EKV Event.KeyEvent.wVirtualKeyCode 
+typedef int i; typedef unsigned int ui; typedef INPUT_RECORD IR; typedef HANDLE H;
+struct V { i x; i y; V():x(0), y(0) {} V(i x, i y):x(x), y(y) {} };
+int main() { timeBeginPeriod(0); srand((ui)time(0));
+H o = (H)::GetStdHandle(-11), input = (H)::GetStdHandle(-10);
+SMALL_RECT ws = {0,0,70-1,35-1}, r = {0,0,70-1,35-1}; COORD bs={70,35}, bc={0, 0};
+CHAR_INFO ob[70 * 35]; i gd=0; V ap=V(10, 10), s[100], sd(-1, 0);
+DWORD noe, noer; IR* eb; ui ct=timeGetTime(), pt=ct, et=0, msm=100, mt=0, sl=1;
+for(ui ii=0; ii<sl; ++ii) {s[ii]=V(70/2,35/2);}
+::SetConsoleWindowInfo(o, 1, &ws); ::SetConsoleScreenBufferSize(o, bs);
+while (!gd) {pt=ct; ct=timeGetTime(); et=ct-pt;
+for (i ii=0; ii<70*35; ++ii) {ob[ii].Char.AsciiChar=32; ob[ii].Attributes=0;}
+::GetNumberOfConsoleInputEvents(input, &noe);
+if(noe){eb=(IR*)malloc(sizeof(IR)*noe); ReadConsoleInput(input, eb, noe, &noer);}
+for(ui ii = 0; ii < noer; ++ii){if (eb[ii].EventType == 1){
+if(eb[ii].EKV==37) if(!(sd.x==1 && sd.y==0)){sd.x=-1; sd.y=0;} if(eb[ii].EKV==39) if(!(sd.x==-1 && sd.y==0)){sd.x=1; sd.y=0;}
+if(eb[ii].EKV==38) if(!(sd.x==0 && sd.y==1)){sd.x=0; sd.y=-1;}if(eb[ii].EKV==40) if(!(sd.x==0 && sd.y==-1)){sd.x=0; sd.y=1;}}}
+if(noe>0){free(eb);}if((mt+=et) > msm){for(i ii=sl-1; ii>0; --ii)
+{s[ii].x=s[ii - 1].x; s[ii].y=s[ii-1].y;} s[0].x+=sd.x; s[0].y+=sd.y; mt=0;}
+for (ui ii = 1; ii < sl - 1; ++ii) { if (s[0].x == s[ii].x && s[0].y == s[ii].y) {gd=1;}}
+if (s[0].x<0 || s[0].x>70-1 || s[0].y<0 || s[0].y>35-1) {break;}
+if (s[0].x == ap.x && s[0].y == ap.y){                
+while (true) { i fgs=1; ap.x = rand() % 70; ap.y = rand() % 35;
+for (ui ii = 0; ii < sl; ++ii) { if (s[ii].x == ap.x && s[ii].y == ap.y) {fgs=0;}}
+if (fgs) { break; }} s[sl++] = V(s[sl - 1].x, s[sl - 1].y);
+msm -= (msm < 50) ? 0 : 10;} ob[ap.y * 70 + ap.x].Char.AsciiChar = 64;
+ob[ap.y * 70 + ap.x].Attributes = 4; for (ui ii = 0; ii < sl; ++ii) {
+ob[s[ii].y * 70 + s[ii].x].Char.AsciiChar = 35; ob[s[ii].y * 70 + s[ii].x].Attributes = 2;}                
+::WriteConsoleOutputA(o, ob, bs, bc, &r);} timeEndPeriod(0);return 0;}
